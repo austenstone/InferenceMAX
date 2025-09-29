@@ -10,6 +10,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  #######################################
+  #               H100                  #
+  #######################################
   bmk-h100-llama:
     if: contains(github.event.pull_request.labels.*.name, 'llama-h100')
     strategy:
@@ -26,7 +29,7 @@ jobs:
     name: 'llama-${{ matrix.runner }}'
     uses: ./.github/workflows/benchmark-tmpl.yml
     secrets: inherit
-    with:
+    with: &benchmark_tmpl_args
       runner: ${{ matrix.runner }}
       image: ${{ matrix.config.image }}
       model: ${{ matrix.config.model }}
@@ -52,19 +55,7 @@ jobs:
     name: 'gptoss-${{ matrix.runner }}'
     uses: ./.github/workflows/benchmark-tmpl.yml
     secrets: inherit
-    with:
-      runner: ${{ matrix.runner }}
-      image: ${{ matrix.config.image }}
-      model: ${{ matrix.config.model }}
-      framework: ${{ matrix.config.framework }}
-      precision: ${{ matrix.config.precision }}
-      exp-name: ${{ matrix.config.exp-name }}
-      isl: 1024
-      osl: 1024
-      max-model-len: 2048
-      random-range-ratio: 0.8
-      tp-list: '[8]'
-      conc-list: '[1]'
+    with: *benchmark_tmpl_args
 
   bmk-mi300x-gptoss:
     if: contains(github.event.pull_request.labels.*.name, 'gptoss-mi300x')
