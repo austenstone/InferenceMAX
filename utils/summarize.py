@@ -12,7 +12,7 @@ for result_path in results_dir.rglob(f'*.json'):
 results.sort(key=lambda r: (r['hw'], r.get('framework', 'vllm'), r.get('precision', 'fp8'), r['tp'], r['ep'], r['conc']))
 
 summary_header = f'''\
-| Hardware | Framework | Precision | TP | EP | DP Attention | Conc | TTFT (ms) | TPOT (ms) | E2EL (s) | TPUT per GPU |
+| Hardware | Framework | Precision | TP | EP | Conc | DP Attention | TTFT (ms) | TPOT (ms) | E2EL (s) | TPUT per GPU |
 | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |\
 '''
 print(summary_header)
