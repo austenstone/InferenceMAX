@@ -40,21 +40,21 @@ on:
         default: false
 
 jobs:
-  bmk-h200-fp8:
-    if: ${{ inputs.use_h200 }}
-    uses: ./.github/workflows/benchmark-tmpl.yml
-    secrets: inherit
-    with:
-      runner: h200
-      image: 'lmsysorg/sglang:v0.5.2rc2-cu126'
-      model: 'deepseek-ai/DeepSeek-R1-0528'
-      framework: 'sglang'
-      precision: 'fp8'
-      exp-name: ${{ inputs.exp-name }}
-      isl: ${{ inputs.isl }}
-      osl: ${{ inputs.osl }}
-      max-model-len: ${{ inputs.max-model-len }}
-      random-range-ratio: ${{ inputs.random-range-ratio }}
+  # bmk-h200-fp8:
+  #   if: ${{ inputs.use_h200 }}
+  #   uses: ./.github/workflows/benchmark-tmpl.yml
+  #   secrets: inherit
+  #   with:
+  #     runner: h200
+  #     image: 'lmsysorg/sglang:v0.5.2rc2-cu126'
+  #     model: 'deepseek-ai/DeepSeek-R1-0528'
+  #     framework: 'sglang'
+  #     precision: 'fp8'
+  #     exp-name: ${{ inputs.exp-name }}
+  #     isl: ${{ inputs.isl }}
+  #     osl: ${{ inputs.osl }}
+  #     max-model-len: ${{ inputs.max-model-len }}
+  #     random-range-ratio: ${{ inputs.random-range-ratio }}
 
   bmk-h200-trt-fp8:
     if: ${{ inputs.use_h200 }}
