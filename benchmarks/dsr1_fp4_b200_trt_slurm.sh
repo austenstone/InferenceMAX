@@ -18,19 +18,14 @@
 
 echo "JOB $SLURM_JOB_ID running on $SLURMD_NODENAME"
 
-# Default backend is TRTLLM
-if [[ "MOE_BACKEND" == "NONE" ]]; then
-    MOE_BACKEND="TRTLLM"
-fi
+# Default
+MOE_BACKEND="TRTLLM"
 
 echo "TP: $TP, CONC: $CONC, ISL: $ISL, OSL: $OSL, EP_SIZE: $EP_SIZE, DP_ATTENTION=$DP_ATTENTION, MOE_BACKEND=$MOE_BACKEND"
 
 hf download $MODEL
 
 # ========= Determine MOE_BACKEND based on ISL, OSL, CONC =========
-# Default
-MOE_BACKEND="TRTLLM"
-
 if [[ "$TP" == "4" ]]; then
     if [[ "$ISL" == "1024" && "$OSL" == "1024" ]]; then
         if [[ $CONC -ge 256 ]]; then
