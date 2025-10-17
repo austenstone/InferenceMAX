@@ -70,7 +70,7 @@ This tests [4, 16, 64] (multiplies by 4 instead of default 2)
 2. **Precisions**: `fp4`, `fp8`
 3. **Sequence lengths**: `1k1k`, `1k8k`, `8k1k` (input×output)
 4. Each entry expands to test all combinations of TP and concurrency values
-5. Use `-trt` suffix for TensorRT-optimized hardware configs
+5. There are comments throughout the yaml that were ported over from bash scripts describing what parallelism settings should be set depending on concurrency -- keep an eye out for those.
 
 ## Testing Your Changes
 

@@ -5,9 +5,11 @@ from pathlib import Path
 
 hw = sys.argv[1]
 tp_size = int(sys.argv[2])
-result_filename = sys.argv[3]
-framework = sys.argv[4]
-precision = sys.argv[5]
+ep_size = int(sys.argv[3])
+dp_attention = sys.argv[4]
+result_filename = sys.argv[5]
+framework = sys.argv[6]
+precision = sys.argv[7]
 
 with open(f'{result_filename}.json') as f:
     bmk_result = json.load(f)
@@ -15,7 +17,9 @@ with open(f'{result_filename}.json') as f:
 data = {
     'hw': hw,
     'tp': tp_size,
+    'ep': ep_size,
     'conc': int(bmk_result['max_concurrency']),
+    'dp_attention': dp_attention, # true or false
     'model': bmk_result['model_id'],
     'framework': framework,
     'precision': precision,
@@ -23,8 +27,8 @@ data = {
     'output_tput_per_gpu': float(bmk_result['output_throughput']) / tp_size
 }
 
-if len(sys.argv) == 7:  # MTP
-    data['mtp'] = sys.argv[6]
+if len(sys.argv) == 9:  # MTP
+    data['mtp'] = sys.argv[8]
 
 for key, value in bmk_result.items():
     if key.endswith('ms'):

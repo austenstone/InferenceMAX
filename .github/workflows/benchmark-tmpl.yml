@@ -70,7 +70,7 @@ jobs:
       fail-fast: false
       matrix:
         config: ${{ fromJson(needs.flatten-search-space-matrix.outputs.flattened-matrix) }}
-        
+
     name: '${{ inputs.exp-name }} ${{ inputs.runner }} ${{ inputs.precision }} tp${{ matrix.config.tp }} ep${{ matrix.config.ep || 1 }} conc${{ matrix.config.conc }}'
 
     env:
@@ -153,7 +153,7 @@ jobs:
 
       - name: Process result
         run: |
-          python3 utils/process_result.py ${{ inputs.runner }} $TP $RESULT_FILENAME $FRAMEWORK $PRECISION
+          python3 utils/process_result.py ${{ inputs.runner }} $TP $EP_SIZE $DP_ATTENTION $RESULT_FILENAME $FRAMEWORK $PRECISION
 
       - name: Upload result
         uses: actions/upload-artifact@v4
