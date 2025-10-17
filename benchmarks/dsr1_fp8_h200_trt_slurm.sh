@@ -13,31 +13,39 @@
 # CONC
 # RESULT_FILENAME
 # PORT_OFFSET
+# EP_SIZE
+# DP_ATTENTION
+# MOE_BACKEND
 
 echo "JOB $SLURM_JOB_ID running on $SLURMD_NODENAME"
 
-echo "TP: $TP, CONC: $CONC, ISL: $ISL, OSL: $OSL"
+# Default backend is CUTLASS
+if [[ "MOE_BACKEND" == "NONE" ]]; then
+    MOE_BACKEND="CUTLASS"
+fi
+
+echo "TP: $TP, CONC: $CONC, ISL: $ISL, OSL: $OSL, EP_SIZE: $EP_SIZE, DP_ATTENTION=$DP_ATTENTION, MOE_BACKEND=$MOE_BACKEND"
 
 hf download $MODEL
 
 # ========= Determine DP_ATTENTION, EP_SIZE and MOE_BACKEND based on ISL, OSL, CONC =========
-EP_SIZE="$TP"
-MOE_BACKEND="CUTLASS"
-DP_ATTENTION=false
+# EP_SIZE="$TP"
+# MOE_BACKEND="CUTLASS"
+# DP_ATTENTION=false
 
-if [[ "$ISL" == "1024" && "$OSL" == "1024" ]]; then
-    if [[ $CONC -gt 64 ]]; then
-        DP_ATTENTION=true
-    fi
-elif [[ "$ISL" == "1024" && "$OSL" == "8192" ]]; then
-    if [[ $CONC -gt 64 ]]; then
-        DP_ATTENTION=true
-    fi
-elif [[ "$ISL" == "8192" && "$OSL" == "1024" ]]; then
-    if [[ $CONC -gt 32 ]]; then
-        DP_ATTENTION=true
-    fi
-fi
+# if [[ "$ISL" == "1024" && "$OSL" == "1024" ]]; then
+#     if [[ $CONC -gt 64 ]]; then
+#         DP_ATTENTION=true
+#     fi
+# elif [[ "$ISL" == "1024" && "$OSL" == "8192" ]]; then
+#     if [[ $CONC -gt 64 ]]; then
+#         DP_ATTENTION=true
+#     fi
+# elif [[ "$ISL" == "8192" && "$OSL" == "1024" ]]; then
+#     if [[ $CONC -gt 32 ]]; then
+#         DP_ATTENTION=true
+#     fi
+# fi
 
 echo "Final configuration: EP_SIZE='$EP_SIZE', MOE_BACKEND='$MOE_BACKEND', DP_ATTENTION='$DP_ATTENTION'"
 
@@ -49,7 +57,7 @@ cat > $EXTRA_CONFIG_FILE << EOF
 cuda_graph_config:
     enable_padding: true
     max_batch_size: 128
-enable_attention_dp: $DP_ATTENTION
+ enable_attention_dp: $DP_ATTENTION
 print_iter_log: true
 kv_cache_config:
     dtype: fp8

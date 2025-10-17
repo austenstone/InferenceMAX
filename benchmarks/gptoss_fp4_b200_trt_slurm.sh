@@ -13,48 +13,56 @@
 # CONC
 # RESULT_FILENAME
 # PORT_OFFSET
+# EP_SIZE
+# DP_ATTENTION
+# MOE_BACKEND
 
 # GPTOSS TRTLLM Deployment Guide:
 # https://github.com/NVIDIA/TensorRT-LLM/blob/main/docs/source/deployment-guide/quick-start-recipe-for-gpt-oss-on-trtllm.md
 
 echo "JOB $SLURM_JOB_ID running on $SLURMD_NODENAME"
 
-echo "TP: $TP, CONC: $CONC, ISL: $ISL, OSL: $OSL"
+# Default backend is TRTLLM
+if [[ "MOE_BACKEND" == "NONE" ]]; then
+    MOE_BACKEND="TRTLLM"
+fi
+
+echo "TP: $TP, CONC: $CONC, ISL: $ISL, OSL: $OSL, EP_SIZE: $EP_SIZE, DP_ATTENTION=$DP_ATTENTION, MOE_BACKEND=$MOE_BACKEND"
 
 hf download $MODEL
 SERVER_LOG=$(mktemp /tmp/server-XXXXXX.log)
 PORT=$(( 8888 + $PORT_OFFSET ))
 
 # ========= Determine DP_ATTENTION, EP_SIZE and MOE_BACKEND based on ISL, OSL, CONC =========
-EP_SIZE="1"
-MOE_BACKEND="TRTLLM"
-DP_ATTENTION=false
+# EP_SIZE="1"
+# MOE_BACKEND="TRTLLM"
+# DP_ATTENTION=false
 
 # Lower concurrencies: Concurrency < 256
 # MoE backend=TRTLLM
 # Use TP Attention; Switch to MoE Expert parallel for conurrency >=16 (1k1k and 1k8k)
-TEP_REQUIRED=false
-if [[ "$TP" == "4" || "$TP" == "8" ]]; then 
-    if [[ "$ISL" == "1024" && "$OSL" == "1024" ]]; then
-        TEP_REQUIRED=true
-    elif [[ "$ISL" == "1024" && "$OSL" == "8192" ]]; then
-        TEP_REQUIRED=true
-    fi
-fi
-if [[ "$TEP_REQUIRED" == "true" && $CONC -ge 16 ]]; then
-    EP_SIZE="$TP"
-fi
+# TEP_REQUIRED=false
+# if [[ "$TP" == "4" || "$TP" == "8" ]]; then 
+#     if [[ "$ISL" == "1024" && "$OSL" == "1024" ]]; then
+#         TEP_REQUIRED=true
+#     elif [[ "$ISL" == "1024" && "$OSL" == "8192" ]]; then
+#         TEP_REQUIRED=true
+#     fi
+# fi
+# if [[ "$TEP_REQUIRED" == "true" && $CONC -ge 16 ]]; then
+#     EP_SIZE="$TP"
+# fi
 
 # Higher concurrencies: Concurrency >= 256
 #   MoE Backend = CUTLASS
 #   Use DP attention with expert parallel MoE
-if [[ $CONC -ge 256 ]]; then
-    EP_SIZE="$TP"
-    DP_ATTENTION=true
-    MOE_BACKEND="CUTLASS"
-fi
+# if [[ $CONC -ge 256 ]]; then
+#     EP_SIZE="$TP"
+#     DP_ATTENTION=true
+#     MOE_BACKEND="CUTLASS"
+# fi
 
-echo "Final configuration: EP_SIZE='$EP_SIZE', MOE_BACKEND='$MOE_BACKEND', DP_ATTENTION='$DP_ATTENTION'"
+# echo "Final configuration: EP_SIZE='$EP_SIZE', MOE_BACKEND='$MOE_BACKEND', DP_ATTENTION='$DP_ATTENTION'"
 
 EXTRA_CONFIG_FILE="gptoss-fp4.yml"
 export TRTLLM_ENABLE_PDL=1
