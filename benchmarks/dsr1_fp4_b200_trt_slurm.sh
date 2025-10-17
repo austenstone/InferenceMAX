@@ -27,7 +27,7 @@ echo "TP: $TP, CONC: $CONC, ISL: $ISL, OSL: $OSL, EP_SIZE: $EP_SIZE, DP_ATTENTIO
 
 hf download $MODEL
 
-# # ========= Determine MOE_BACKEND based on ISL, OSL, CONC =========
+# ========= Determine MOE_BACKEND based on ISL, OSL, CONC =========
 # Default
 MOE_BACKEND="TRTLLM"
 

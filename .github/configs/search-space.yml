@@ -105,6 +105,7 @@ gptoss:
 llama:
   fp4:
     b200:
+      # fix: add TP=2,4 to B200, just as mi355 has
       1k1k:
       - { tp: 1, conc: { start: 64, end: 64 } }
       - { tp: 2, conc: { start: 32, end: 64 } }
@@ -121,6 +122,8 @@ llama:
       - { tp: 4, conc: { start: 4, end: 32 } }
       - { tp: 8, conc: { start: 4, end: 8 } }
     b200-trt:
+      # fix: add TP=2,4 to B200, just as mi355 has
+      # B200 can achieve TPS/User >= 30 with larger concurrency till 128
       1k1k:
       - { tp: 1, conc: { start: 128, end: 128 } }
       - { tp: 2, conc: { start: 64, end: 128 } }
@@ -172,6 +175,7 @@ llama:
       - { tp: [ 1, 2 ], conc: { start: 16, end: 64 } }
       - { tp: [ 4, 8 ], conc: { start: 4, end: 64 } }
     h200-trt:
+      # H200 can achieve TPS/User >= 30 with larger concurrency till 128
       1k1k:
       - { tp: 1, conc: { start: 128, end: 128 } }
       - { tp: 2, conc: { start: 64, end: 128 } }
@@ -187,6 +191,7 @@ llama:
       - { tp: 4, conc: { start: 4, end: 128 } }
       - { tp: 8, conc: { start: 4, end: 32 } }
     b200:
+      # fix: add TP=2,4 to B200, just as mi355 has
       1k1k:
       - { tp: 1, conc: { start: 64, end: 64 } }
       - { tp: 2, conc: { start: 32, end: 64 } }
@@ -201,6 +206,8 @@ llama:
       - { tp: 4, conc: { start: 4, end: 64 } }
       - { tp: 8, conc: { start: 4, end: 32 } }
     b200-trt:
+      # fix: add TP=2,4 to B200, just as mi355 has
+      # B200 can achieve TPS/User >= 30 with larger concurrency till 256
       1k1k:
       - { tp: 1, conc: { start: 128, end: 128 } }
       - { tp: 2, conc: { start: 64, end: 128 } }
