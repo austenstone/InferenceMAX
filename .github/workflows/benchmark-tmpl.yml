@@ -70,7 +70,8 @@ jobs:
       fail-fast: false
       matrix:
         config: ${{ fromJson(needs.flatten-search-space-matrix.outputs.flattened-matrix) }}
-    name: '${{ inputs.exp-name }} ${{ inputs.runner }} ${{ inputs.precision }} tp${{ matrix.config.tp }} conc${{ matrix.config.conc }}'
+        
+    name: '${{ inputs.exp-name }} ${{ inputs.runner }} ${{ inputs.precision }} tp${{ matrix.config.tp }} ep${{ matrix.config.ep || 1 }} conc${{ matrix.config.conc }}'
 
     env:
       TP: ${{ matrix.config.tp }}
