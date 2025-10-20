@@ -17,9 +17,11 @@
 echo "JOB $SLURM_JOB_ID running on $SLURMD_NODENAME"
 
 cat > config.yaml << EOF
+compilation-config: '{"cudagraph_mode":"PIECEWISE"}'
 async-scheduling: true
 no-enable-prefix-caching: true
 max-num-batched-tokens: 8192
+cuda-graph-sizes: 2048
 max-model-len: 10240
 EOF
 
