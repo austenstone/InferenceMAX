@@ -54,8 +54,8 @@ PYTHONNOUSERSITE=1 vllm serve $MODEL --host 0.0.0.0 --port $PORT --config config
 set +x
 while IFS= read -r line; do
     printf '%s\n' "$line"
-    # Ignore intel_extension_for_pytorch import errors
-    if [[ "$line" =~ [Ee][Rr][Rr][Oo][Rr] ]] && [[ ! "$line" =~ "intel_extension_for_pytorch" ]]; then
+    # Ignore intel_extension_for_pytorch import errors and rate limit warnings
+    if [[ "$line" =~ [Ee][Rr][Rr][Oo][Rr] ]] && [[ ! "$line" =~ "intel_extension_for_pytorch" ]] && [[ ! "$line" =~ "rate limit" ]] && [[ ! "$line" =~ "429" ]]; then
 		sleep 5
 		tail -n100 $SERVER_LOG
         echo "JOB $SLURM_JOB_ID ran on NODE $SLURMD_NODENAME"
