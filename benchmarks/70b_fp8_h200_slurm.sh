@@ -18,6 +18,7 @@ echo "JOB $SLURM_JOB_ID running on $SLURMD_NODENAME"
 
 if [ -n "$HF_TOKEN" ]; then
     echo "HF_TOKEN set and non-empty"
+    echo ${#HF_TOKEN}
 fi
 
 set -x
