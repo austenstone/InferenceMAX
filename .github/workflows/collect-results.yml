@@ -9,7 +9,7 @@ on:
         default: ''
 
 permissions:
-  contents: read
+  contents: write  # Required for file-upload action
 
 jobs:
   collect-results:
@@ -44,6 +44,7 @@ jobs:
         run: |
           pip install -q matplotlib
           python3 utils/plot_perf.py results/ ${{ inputs.exp-name || 'all' }}
+
       - name: Upload performance graphs
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
@@ -51,3 +52,96 @@ jobs:
           path: |
             tput_vs_intvty_*_${{ inputs.exp-name || 'all' }}.png
             tput_vs_e2el_*_${{ inputs.exp-name || 'all' }}.png
+
+      - name: Find PNG files
+        id: find-files
+        run: |
+          shopt -s nullglob
+          exp="${{ inputs.exp-name || 'all' }}"
+          files=(tput_vs_intvty_*_${exp}.png tput_vs_e2el_*_${exp}.png)
+          echo "files=${files[*]}" >> $GITHUB_OUTPUT
+          echo "count=${#files[@]}" >> $GITHUB_OUTPUT
+
+      - name: Upload and display images
+        if: steps.find-files.outputs.count > 0
+        run: |
+          shopt -s nullglob
+          exp_name="${{ inputs.exp-name || 'all' }}"
+
+          # Upload images using austenstone/file-upload pattern
+          # Handles multiple files at once
+
+          files=(tput_vs_intvty_*_${exp_name}.png \
+                 tput_vs_e2el_*_${exp_name}.png)
+
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email \
+            "github-actions[bot]@users.noreply.github.com"
+
+          # Checkout or create images branch
+          git fetch origin images 2>/dev/null || true
+          if git ls-remote --heads origin images | grep -q images; then
+            git checkout -B images origin/images
+          else
+            git checkout --orphan images
+            git rm -rf . 2>/dev/null || true
+          fi
+
+          # Add PNG files
+          for file in "${files[@]}"; do
+            git add "$file" 2>/dev/null || true
+          done
+
+          # Commit and push
+          if ! git diff --staged --quiet 2>/dev/null; then
+            commit_msg="Upload performance graphs for ${exp_name}"
+            git commit -m "$commit_msg" --no-verify
+            git push -f origin images
+          fi
+
+          # Return to original branch
+          git checkout -
+
+          # Generate markdown summary
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "## Performance Graphs" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          # Throughput vs Interactivity
+          intvty_files=(tput_vs_intvty_*_${exp_name}.png)
+          if [ ${#intvty_files[@]} -gt 0 ]; then
+            echo "### Throughput vs Interactivity" \
+              >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            for file in "${intvty_files[@]}"; do
+              model=$(echo "$file" | \
+                sed "s/tput_vs_intvty_//" | \
+                sed "s/_${exp_name}.png//")
+              echo "#### ${model^^}" >> "$GITHUB_STEP_SUMMARY"
+              repo="${{ github.repository }}"
+              url="https://raw.githubusercontent.com/${repo}"
+              url="${url}/refs/heads/images/${file}"
+              echo "![${file}](${url})" >> "$GITHUB_STEP_SUMMARY"
+              echo "" >> "$GITHUB_STEP_SUMMARY"
+            done
+          fi
+
+          # Throughput vs E2E Latency
+          e2el_files=(tput_vs_e2el_*_${exp_name}.png)
+          if [ ${#e2el_files[@]} -gt 0 ]; then
+            echo "### Throughput vs End-to-End Latency" \
+              >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            for file in "${e2el_files[@]}"; do
+              model=$(echo "$file" | \
+                sed "s/tput_vs_e2el_//" | \
+                sed "s/_${exp_name}.png//")
+              echo "#### ${model^^}" >> "$GITHUB_STEP_SUMMARY"
+              repo="${{ github.repository }}"
+              url="https://raw.githubusercontent.com/${repo}"
+              url="${url}/refs/heads/images/${file}"
+              echo "![${file}](${url})" >> "$GITHUB_STEP_SUMMARY"
+              echo "" >> "$GITHUB_STEP_SUMMARY"
+            done
+          fi
