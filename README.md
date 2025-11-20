@@ -7,7 +7,7 @@ InferenceMAX™ runs our suite of benchmarks every night, continually re-benchma
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/06966bbc-ebc8-4b3f-9201-d7f2628180cc">
   <source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/e78a2789-f65e-4315-af59-a4de6de73488">
-  <img alt="Fallback image description" src="https://github.com/user-attachments/assets/e78a2789-f65e-4315-af59-a4de6de73488">
+  <img alt="InferenceMAX benchmark results visualization" src="https://github.com/user-attachments/assets/e78a2789-f65e-4315-af59-a4de6de73488">
 </picture>
 
 ## Why?
